@@ -10,11 +10,19 @@ from tqdm import tqdm
 def train_model(data_file='Data/commands_responses.json', save_path='model_checkpoint.pth', 
                 d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6,
                 batch_size=32, num_epochs=10, learning_rate=0.0001):
+    
+    # Get the directory of the current script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Construct absolute paths
+    data_file_path = os.path.join(current_dir, data_file)
+    save_path = os.path.join(current_dir, save_path)
+    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
     # Initialize dataset and dataloader
-    dataset = TextDataset(data_file)
+    dataset = TextDataset(data_file_path)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
     # Initialize model

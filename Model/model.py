@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import math
 
 class SimpleTransformer(nn.Module):
     def __init__(self, vocab_size, d_model, nhead, num_encoder_layers, num_decoder_layers, dropout=0.1):

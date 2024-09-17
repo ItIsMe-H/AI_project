@@ -1,5 +1,6 @@
 import json
 import torch
+import os
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 from collections import Counter
@@ -44,13 +45,17 @@ class Vocabulary:
         ]
 
 class TextDataset(Dataset):
-    def __init__(self, data_file, freq_threshold=2):
-        self.data = self.load_data(data_file)
-        self.command_vocab = Vocabulary(freq_threshold)
-        self.response_vocab = Vocabulary(freq_threshold)
+    # ... (other methods remain the same)
 
-        self.command_vocab.build_vocabulary([item['command'] for item in self.data])
-        self.response_vocab.build_vocabulary([item['response'] for item in self.data])
+    @staticmethod
+    def load_data(data_file):
+        try:
+            with open(data_file, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise Exception(f"Data file {data_file} not found. Current working directory: {os.getcwd()}")
+        except json.JSONDecodeError:
+            raise Exception(f"Error decoding JSON from {data_file}.")
 
     @staticmethod
     def load_data(data_file):
