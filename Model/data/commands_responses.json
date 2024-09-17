@@ -1,19 +1,4 @@
 [
-  {"command": "Build a calculator application", "response": "Start creating a new project in your preferred IDE and set up basic calculations."},
-  {"command": "Research the latest trends in AI", "response": "Search for recent publications and articles on AI trends and summarize the key points."},
-  {"command": "Generate a project report", "response": "Compile all project data and generate a summary report including key metrics and outcomes."},
-  {"command": "Create a website layout", "response": "Design a basic website layout with HTML and CSS including header, footer, and main content area."},
-  {"command": "Find open-source machine learning libraries", "response": "Search for popular open-source machine learning libraries and provide a list with brief descriptions."},
-  {"command": "Write a Python script for data analysis", "response": "Develop a Python script to analyze given datasets using libraries like pandas and matplotlib."},
-  {"command": "Draft a proposal for a new app", "response": "Prepare a proposal document outlining the app concept, target audience, and development plan."},
-  {"command": "Translate text to French", "response": "Use translation libraries or APIs to convert the given text into French."},
-  {"command": "Generate a random password", "response": "Create a secure, random password using a combination of letters, numbers, and special characters."},
-  {"command": "Optimize SQL queries", "response": "Review and improve the efficiency of SQL queries for better database performance."},
-  {"command": "Set up a virtual environment", "response": "Create and activate a virtual environment for Python development using `venv` or `virtualenv`."},
-  {"command": "Analyze social media trends", "response": "Gather and analyze data from social media platforms to identify current trends and patterns."},
-  {"command": "Create a machine learning model", "response": "Build and train a machine learning model using a suitable algorithm and dataset."},
-  {"command": "Develop a RESTful API", "response": "Design and implement a RESTful API to handle CRUD operations and provide data to clients."},
-  {"command": "Write a unit test for a function", "response": "Create unit tests for a specific function to ensure it behaves as expected under various conditions."},
-  {"command": "Draft an email to a client", "response": "Compose a professional email addressing the client’s concerns and providing necessary information or updates."},
-  {"command": "Design a database schema", "response": "Plan and create a database schema to structure and organize data effectively for an application."}
+    {"command": "1 2 3", "response": "4 5 6"},
+    {"command": "7 8 9", "response": "10 11 12"}
 ]

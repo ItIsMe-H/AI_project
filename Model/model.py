@@ -1,3 +1,4 @@
+# model.py
 import torch
 import torch.nn as nn
 
@@ -13,3 +14,8 @@ class SimpleTransformer(nn.Module):
         tgt = self.embedding(tgt)
         output = self.transformer(src, tgt)
         return self.fc_out(output)
+
+# Example usage:
+if __name__ == "__main__":
+    model = SimpleTransformer(vocab_size=10000, d_model=512, nhead=8, num_encoder_layers=6, num_decoder_layers=6)
+    print(model)
