@@ -27,7 +27,7 @@ def train_model(data_file='Data/commands_responses.json', save_path='model_check
 
     # Initialize model
     model = SimpleTransformer(
-        vocab_size=len(dataset.response_vocab),
+        vocab_size=len(dataset.vocab),
         d_model=d_model,
         nhead=nhead,
         num_encoder_layers=num_encoder_layers,
@@ -35,7 +35,7 @@ def train_model(data_file='Data/commands_responses.json', save_path='model_check
     ).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    criterion = nn.CrossEntropyLoss(ignore_index=dataset.response_vocab.stoi[dataset.response_vocab.PAD_TOKEN])
+    criterion = nn.CrossEntropyLoss(ignore_index=dataset.vocab.stoi[dataset.vocab.PAD_TOKEN])
 
     # Training loop
     for epoch in range(num_epochs):

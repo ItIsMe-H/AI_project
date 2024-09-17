@@ -1,15 +1,15 @@
 import json
 import torch
-import os
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 from collections import Counter
+import os
 
 # Define special tokens
-UNK_TOKEN = '<unk>'
 PAD_TOKEN = '<pad>'
 SOS_TOKEN = '<sos>'
 EOS_TOKEN = '<eos>'
+UNK_TOKEN = '<unk>'
 
 class Vocabulary:
     def __init__(self, freq_threshold=2):
@@ -45,7 +45,11 @@ class Vocabulary:
         ]
 
 class TextDataset(Dataset):
-    # ... (other methods remain the same)
+    def __init__(self, data_file, freq_threshold=2):
+        self.data = self.load_data(data_file)
+        self.vocab = Vocabulary(freq_threshold)
+
+        self.vocab.build_vocabulary(item['command'] + ' ' + item['response'] for item in self.data)
 
     @staticmethod
     def load_data(data_file):
@@ -57,16 +61,6 @@ class TextDataset(Dataset):
         except json.JSONDecodeError:
             raise Exception(f"Error decoding JSON from {data_file}.")
 
-    @staticmethod
-    def load_data(data_file):
-        try:
-            with open(data_file, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            raise Exception(f"Data file {data_file} not found.")
-        except json.JSONDecodeError:
-            raise Exception(f"Error decoding JSON from {data_file}.")
-
     def __len__(self):
         return len(self.data)
 
@@ -74,13 +68,13 @@ class TextDataset(Dataset):
         command = self.data[index]['command']
         response = self.data[index]['response']
 
-        numericalized_command = [self.command_vocab.stoi[SOS_TOKEN]] + \
-                                self.command_vocab.numericalize(command) + \
-                                [self.command_vocab.stoi[EOS_TOKEN]]
+        numericalized_command = [self.vocab.stoi[SOS_TOKEN]] + \
+                                self.vocab.numericalize(command) + \
+                                [self.vocab.stoi[EOS_TOKEN]]
 
-        numericalized_response = [self.response_vocab.stoi[SOS_TOKEN]] + \
-                                 self.response_vocab.numericalize(response) + \
-                                 [self.response_vocab.stoi[EOS_TOKEN]]
+        numericalized_response = [self.vocab.stoi[SOS_TOKEN]] + \
+                                 self.vocab.numericalize(response) + \
+                                 [self.vocab.stoi[EOS_TOKEN]]
 
         return torch.tensor(numericalized_command), torch.tensor(numericalized_response)
 
