@@ -1,15 +1,14 @@
-# train_model.py
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from preprocess import TextDataset, collate_fn
 from model import SimpleTransformer
-from preprocess import TextDataset
 
 def train_model():
     # Load dataset
     dataset = TextDataset('data/commands_responses.json')
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
+    dataloader = DataLoader(dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
 
     # Model parameters
     vocab_size = len(dataset.vocab)
@@ -26,22 +25,15 @@ def train_model():
     # Training loop
     model.train()
     for epoch in range(1):  # Change the range for more epochs
-        for src, tgt in dataloader:
+        for src, tgt, src_lengths, tgt_lengths in dataloader:
             # Forward pass
             optimizer.zero_grad()
-            output = model(src, tgt)
-            loss = criterion(output.view(-1, vocab_size), tgt.view(-1))
+            output = model(src, tgt[:, :-1])  # Adjust tgt to match transformer expectations
+            loss = criterion(output.view(-1, vocab_size), tgt[:, 1:].contiguous().view(-1))
             # Backward pass and optimization
             loss.backward()
             optimizer.step()
             print(f"Epoch {epoch+1}, Loss: {loss.item()}")
-
-def collate_fn(batch):
-    # Custom collate function for padding
-    src_batch, tgt_batch = zip(*batch)
-    src_batch = torch.nn.utils.rnn.pad_sequence(src_batch, batch_first=True, padding_value=0)
-    tgt_batch = torch.nn.utils.rnn.pad_sequence(tgt_batch, batch_first=True, padding_value=0)
-    return src_batch, tgt_batch
 
 if __name__ == "__main__":
     train_model()

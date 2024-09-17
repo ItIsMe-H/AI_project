@@ -1,73 +1,56 @@
-# preprocess.py
 import json
 import torch
 from torch.utils.data import Dataset
+from torch.nn.utils.rnn import pad_sequence
 from collections import Counter
-import re
+from typing import List
 
 class TextDataset(Dataset):
-    def __init__(self, data_file, vocab_size=10000, max_length=50):
-        # Load data from JSON file
+    def __init__(self, data_file):
         with open(data_file, 'r') as file:
             self.data = json.load(file)
         
-        # Tokenization and Vocabulary creation
-        self.vocab_size = vocab_size
-        self.max_length = max_length
+        # Create vocabulary and token mappings
         self.vocab = self.build_vocab()
         self.pad_token_id = self.vocab['<pad>']
-        self.tokenizer = self.get_tokenizer()
-
-    def build_vocab(self):
-        # Build vocabulary from dataset
+        
+    def build_vocab(self) -> dict:
+        # Example vocabulary
+        vocab = {'<pad>': 0}
         counter = Counter()
+        
         for item in self.data:
             command = item['command']
             response = item['response']
-            tokens = self.tokenizer(command) + self.tokenizer(response)
-            counter.update(tokens)
+            counter.update(command.split())
+            counter.update(response.split())
         
-        # Create vocab with special tokens
-        vocab = {word: idx + 1 for idx, (word, _) in enumerate(counter.most_common(self.vocab_size - 1))}
-        vocab['<pad>'] = 0  # Add padding token
+        for word, _ in counter.items():
+            if word not in vocab:
+                vocab[word] = len(vocab)
+        
         return vocab
 
-    def get_tokenizer(self):
-        # Simple whitespace tokenizer
-        def tokenizer(text):
-            return re.findall(r'\S+', text)
-        return tokenizer
-
-    def encode(self, text):
-        # Convert text to list of token IDs
-        tokens = self.tokenizer(text)
-        return [self.vocab.get(token, self.vocab.get('<unk>', 0)) for token in tokens]
-
-    def pad_sequence(self, seq):
-        # Pad or truncate sequence to max_length
-        if len(seq) < self.max_length:
-            seq += [self.pad_token_id] * (self.max_length - len(seq))
-        else:
-            seq = seq[:self.max_length]
-        return seq
-
     def __len__(self):
-        # Return the number of items in the dataset
         return len(self.data)
 
     def __getitem__(self, idx):
-        # Retrieve item at index `idx`
         item = self.data[idx]
-        command = item['command']
-        response = item['response']
+        command = item['command'].split()
+        response = item['response'].split()
         
-        command_ids = self.encode(command)
-        response_ids = self.encode(response)
+        command_tensor = torch.tensor([self.vocab.get(word, 0) for word in command], dtype=torch.long)
+        response_tensor = torch.tensor([self.vocab.get(word, 0) for word in response], dtype=torch.long)
         
-        # Pad sequences
-        command_ids = self.pad_sequence(command_ids)
-        response_ids = self.pad_sequence(response_ids)
-        
-        command_tensor = torch.tensor(command_ids, dtype=torch.long)
-        response_tensor = torch.tensor(response_ids, dtype=torch.long)
         return command_tensor, response_tensor
+
+def collate_fn(batch: List[tuple]) -> tuple:
+    src_batch, tgt_batch = zip(*batch)
+    
+    src_lengths = [len(src) for src in src_batch]
+    tgt_lengths = [len(tgt) for tgt in tgt_batch]
+    
+    src_padded = pad_sequence(src_batch, batch_first=True, padding_value=0)
+    tgt_padded = pad_sequence(tgt_batch, batch_first=True, padding_value=0)
+    
+    return src_padded, tgt_padded, src_lengths, tgt_lengths
