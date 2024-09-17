@@ -1,4 +1,4 @@
-    import torch
+import torch
 import torch.optim as optim
 from model import SimpleTransformer
 from preprocess import TextDataset
