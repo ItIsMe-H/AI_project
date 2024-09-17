@@ -1,11 +1,11 @@
-import torch
+    import torch
 import torch.optim as optim
 from model import SimpleTransformer
 from preprocess import TextDataset
 
 def train_model():
     # Initialize dataset and dataloader
-    dataset = TextDataset('data/commands_responses.json')
+    dataset = TextDataset('./data/commands_responses.json')
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=2, shuffle=True, collate_fn=collate_fn)
 
     # Initialize model
